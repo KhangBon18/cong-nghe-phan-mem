@@ -1,0 +1,63 @@
+@startuml activity-complete-trip
+start
+
+:Quản lý phân công chuyến đi;
+:Hệ thống tạo trip record;
+
+fork
+  :Tài xế nhận thông báo;
+  :Tài xế kiểm tra lịch trình;
+fork again
+  :Phụ huynh nhận thông báo;
+  :Phụ huynh chuẩn bị đưa con ra điểm đón;
+end fork
+
+:Tài xế bắt đầu chuyến đi;
+:Xe bắt đầu gửi vị trí GPS;
+
+repeat
+  :Xe di chuyển đến điểm đón tiếp theo;
+  :Hệ thống tính toán ETA;
+  
+  if (Xe gần điểm đón?) then (yes)
+    :Gửi thông báo cho phụ huynh;
+  endif
+  
+  :Xe đến điểm đón;
+  :Tài xế đón học sinh;
+  :Cập nhật trạng thái đón học sinh;
+  
+  if (Còn điểm đón?) then (yes)
+    :Chuyển sang điểm tiếp theo;
+  else (no)
+    break
+  endif
+repeat while (Có điểm đón)
+
+:Xe đi đến trường;
+
+repeat
+  :Xe di chuyển đến điểm trả tiếp theo;
+  :Hệ thống tính toán ETA;
+  
+  if (Xe gần điểm trả?) then (yes)
+    :Gửi thông báo cho phụ huynh;
+  endif
+  
+  :Xe đến điểm trả;
+  :Tài xế trả học sinh;
+  :Cập nhật trạng thái trả học sinh;
+  
+  if (Còn điểm trả?) then (yes)
+    :Chuyển sang điểm tiếp theo;
+  else (no)
+    break
+  endif
+repeat while (Có điểm trả)
+
+:Tài xế kết thúc chuyến đi;
+:Xe ngừng gửi vị trí GPS;
+:Hệ thống cập nhật báo cáo;
+
+stop
+@enduml

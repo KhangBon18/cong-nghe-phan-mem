@@ -1,0 +1,88 @@
+@startuml sequence-realtime-tracking
+participant "Driver Device" as Device
+participant "Backend API" as API
+participant "Redis Pub/Sub" as Redis
+participant "MySQL DB" as DB
+participant "Admin Dashboard" as Dashboard
+participant "Parent Web" as Parent
+
+activate Device
+activate API
+activate Redis
+
+== Real-time Position Updates ==
+
+loop Every 3 seconds
+    Device -> API: POST /api/telemetry\n{busId, lat, lng, speed, heading, timestamp}
+    activate API
+    
+    API -> Redis: PUBLISH bus:{busId}\n{type: 'location', busId, lat, lng, speed, heading, ts}
+    activate Redis
+    
+    Redis -> Dashboard: WebSocket broadcast\nbus:{busId} channel
+    activate Dashboard
+    Dashboard -> Dashboard: Update bus marker on map
+    deactivate Dashboard
+    
+    Redis -> Parent: WebSocket broadcast\nbus:{busId} channel  
+    activate Parent
+    Parent -> Parent: Update bus position\nif watching this bus
+    deactivate Parent
+    
+    deactivate Redis
+    
+    alt Every 15 seconds (batch save)
+        API -> DB: INSERT INTO positions\n(bus_id, lat, lng, speed, heading, recorded_at)
+        activate DB
+        DB --> API: ACK
+        deactivate DB
+    end
+    
+    API --> Device: 200 OK
+    deactivate API
+end
+
+== Near Stop Detection ==
+
+Device -> API: POST /api/telemetry\n{busId: 123, lat: 10.77, lng: 106.69}
+activate API
+
+API -> API: Calculate distance to next stop\nusing Haversine formula
+
+alt Distance < 200m
+    API -> Redis: PUBLISH bus:123\n{type: 'near_stop', stopId: 456, eta: '2 min'}
+    activate Redis
+    
+    Redis -> Parent: WebSocket event\nif parent has student at this stop
+    activate Parent
+    Parent -> Parent: Show notification:\n"Xe buýt sắp tới điểm đón"
+    deactivate Parent
+    
+    deactivate Redis
+end
+
+alt ETA delay > 5 minutes
+    API -> Redis: PUBLISH bus:123\n{type: 'delay_alert', expectedTime, actualTime}
+    activate Redis
+    
+    Redis -> Dashboard: WebSocket event
+    activate Dashboard
+    Dashboard -> Dashboard: Show delay warning
+    deactivate Dashboard
+    
+    Redis -> Parent: WebSocket event  
+    activate Parent
+    Parent -> Parent: Show notification:\n"Xe buýt trễ hơn dự kiến"
+    deactivate Parent
+    
+    deactivate Redis
+end
+
+API --> Device: 200 OK
+deactivate API
+
+deactivate Device
+deactivate API  
+deactivate Redis
+
+@enduml
