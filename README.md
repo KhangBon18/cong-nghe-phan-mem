@@ -1,4 +1,4 @@
-# Full Stack Application
+# Công Nghệ Phần Mềm - Full Stack Application
 
 Ứng dụng full-stack sử dụng ReactJS frontend, NodeJS backend và MySQL database.
 
@@ -185,4 +185,4 @@ CORS_ORIGIN=http://localhost:3000
 
 ## Tác giả
 
-Dự án được tạo bởi GitHub Copilot
+Dự án Công Nghệ Phần Mềm - Full Stack Application với ReactJS + NodeJS + MySQL
