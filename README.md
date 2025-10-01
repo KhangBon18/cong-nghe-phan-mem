@@ -58,7 +58,38 @@ Project/
 └── README.md
 ```
 
-## 🛠️ Tech Stack
+## 🏃‍♂️ Quick Start for Team Members
+
+### � **Automated Setup (Recommended)**
+
+```bash
+# 1. Clone repository
+git clone https://github.com/KhangBon18/cong-nghe-phan-mem.git
+cd cong-nghe-phan-mem
+
+# 2. Run quick setup script
+chmod +x setup.sh
+./setup.sh
+
+# 3. Update database credentials in backend/.env
+# 4. Create database and import data:
+mysql -u root -p -e "CREATE DATABASE fullstack_app;"
+mysql -u root -p fullstack_app < database/schema.sql
+mysql -u root -p fullstack_app < database/sample_data.sql
+
+# 5. Start all services
+# Terminal 1: cd backend && npm run dev
+# Terminal 2: cd frontend && npm start
+# Terminal 3: cd scripts && node simple-simulator.js
+```
+
+### 📋 **Manual Setup**
+
+Xem file [`SETUP_GUIDE.md`](./SETUP_GUIDE.md) để có hướng dẫn chi tiết từng bước.
+
+---
+
+## 🛠️ Prerequisites
 
 ### Frontend
 - **ReactJS 18.2.0** - UI Framework
